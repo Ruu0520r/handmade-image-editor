@@ -377,7 +377,7 @@
           document.getElementById('sampleStats').textContent =
             `平均輝度: ${sampleStats.avgBrightness.toFixed(0)} | コントラスト: ${sampleStats.contrast.toFixed(0)}`;
           document.getElementById('samplePreview').style.display = 'flex';
-          document.getElementById('card1').classList.add('active-step');
+     document.getElementById('card1').classList.add('active-step');
           checkReady();
         };
         img.src = e.target.result;
@@ -429,8 +429,8 @@
     }
 
     // ─── Image analysis ───────────────────────────────────────────
-    // 白背景を除外して商品部分の輝度のみを計算する
-    // （白背景が多い画像では背景が平均輝度を歪めてガンマが過補正になるため）
+    // 商品部分の輝度のみを計算する（背景・ハイライトを除外）
+    // アクリルボード等の半透明背景も除外するため、輝度ベースの閾値を使用
     function analyzeImage(imageData) {
       const data = imageData.data;
       let sumBrightness = 0;
@@ -439,14 +439,15 @@
         const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
         // 透明ピクセルをスキップ
         if (a < 128) continue;
-        // 白に近い背景ピクセルをスキップ（輝度計算に含めると補正が歪む）
-        if (r > 240 && g > 240 && b > 240) continue;
         const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+        // 明るすぎる背景（白・アクリルボード・ハイライト）をスキップ
+        // 暗すぎる影ピクセルもスキップ（商品の中間輝度域のみ対象）
+        if (brightness > 220 || brightness < 15) continue;
         sumBrightness += brightness;
         values.push(brightness);
       }
-      // 全ピクセルが白/透明の場合のフォールバック
-      if (values.length === 0) {
+      // 対象ピクセルが少ない場合（白背景のみ等）のフォールバック
+      if (values.length < 100) {
         return { avgBrightness: 128, contrast: 0 };
       }
       const n = values.length;
@@ -550,7 +551,7 @@
             const dy = Math.round((outputSize - dh) / 2);
             ctx.drawImage(img, dx, dy, dw, dh);
 
-            // Apply gamma correction via LUT (fast & no highlight blowout)
+     // Apply gamma correction via LUT (fast & no highlight blowout)
             const pixelData = ctx.getImageData(0, 0, outputSize, outputSize);
             const d = pixelData.data;
             for (let j = 0; j < d.length; j += 4) {
