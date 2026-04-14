@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ハンドメイド商品画像 一括編集ツール</title>
+  <title>ãã³ãã¡ã¤ãååç»å ä¸æ¬ç·¨éãã¼ã«</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -262,8 +262,8 @@
 </head>
 <body>
   <header>
-    <h1>🧶 ハンドメイド画像 一括編集</h1>
-    <span class="badge">BASE対応</span>
+    <h1>ð§¶ ãã³ãã¡ã¤ãç»å ä¸æ¬ç·¨é</h1>
+    <span class="badge">BASEå¯¾å¿</span>
   </header>
 
   <div class="container">
@@ -274,14 +274,14 @@
         <div class="step-label">
           <div class="step-num">1</div>
           <div>
-            <div class="step-title">サンプル画像をアップロード</div>
-            <div class="step-desc">このトーンに合わせて全画像を補正します</div>
+            <div class="step-title">ãµã³ãã«ç»åãã¢ããã­ã¼ã</div>
+            <div class="step-desc">ãã®ãã¼ã³ã«åããã¦å¨ç»åãè£æ­£ãã¾ã</div>
           </div>
         </div>
         <div class="drop-zone" id="sampleDrop" onclick="document.getElementById('sampleInput').click()">
-          <div class="icon">🖼️</div>
-          <p>クリックまたはドラッグ＆ドロップ</p>
-          <p style="margin-top:4px; font-size:11px; color:#bbb;">1枚の基準画像</p>
+          <div class="icon">ð¼ï¸</div>
+          <p>ã¯ãªãã¯ã¾ãã¯ãã©ãã°ï¼ãã­ãã</p>
+          <p style="margin-top:4px; font-size:11px; color:#bbb;">1æã®åºæºç»å</p>
         </div>
         <input type="file" id="sampleInput" accept="image/*">
         <div class="sample-preview" id="samplePreview">
@@ -298,14 +298,14 @@
         <div class="step-label">
           <div class="step-num">2</div>
           <div>
-            <div class="step-title">商品画像をまとめてアップロード</div>
-            <div class="step-desc">10〜50枚まとめて選択OK</div>
+            <div class="step-title">ååç»åãã¾ã¨ãã¦ã¢ããã­ã¼ã</div>
+            <div class="step-desc">10ã50æã¾ã¨ãã¦é¸æOK</div>
           </div>
         </div>
         <div class="drop-zone" id="productDrop" onclick="document.getElementById('productInput').click()">
-          <div class="icon">📦</div>
-          <p><span>クリックして複数選択</span>またはドラッグ＆ドロップ</p>
-          <p style="margin-top:4px; font-size:11px; color:#bbb;">JPG・PNG・WEBP 対応</p>
+          <div class="icon">ð¦</div>
+          <p><span>ã¯ãªãã¯ãã¦è¤æ°é¸æ</span>ã¾ãã¯ãã©ãã°ï¼ãã­ãã</p>
+          <p style="margin-top:4px; font-size:11px; color:#bbb;">JPGã»PNGã»WEBP å¯¾å¿</p>
         </div>
         <input type="file" id="productInput" accept="image/*" multiple>
         <div id="productCount" class="file-count-label" style="display:none;"></div>
@@ -315,7 +315,7 @@
 
     <!-- Process Button -->
     <button class="btn-process" id="processBtn" disabled onclick="processImages()">
-      ✨ 一括編集を開始する
+      â¨ ä¸æ¬ç·¨éãéå§ãã
     </button>
 
     <!-- Progress -->
@@ -323,33 +323,33 @@
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progressFill"></div>
       </div>
-      <div class="progress-text" id="progressText">処理中...</div>
+      <div class="progress-text" id="progressText">å¦çä¸­...</div>
     </div>
 
     <!-- Results -->
     <div class="results-section" id="resultsSection">
       <div class="results-header">
-        <h2>✅ 編集完了 <span class="count-badge" id="resultCount"></span></h2>
-        <button class="btn-download" onclick="downloadAll()">📥 全てZIPでダウンロード</button>
+        <h2>â ç·¨éå®äº <span class="count-badge" id="resultCount"></span></h2>
+        <button class="btn-download" onclick="downloadAll()">ð¥ å¨ã¦ZIPã§ãã¦ã³ã­ã¼ã</button>
       </div>
       <div class="results-grid" id="resultsGrid"></div>
     </div>
   </div>
 
   <script>
-    // ─── State ───────────────────────────────────────────────────
+    // âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââ
     let sampleImageData = null;
     let sampleStats = null;
     let productFiles = [];
     let processedCanvases = [];
 
-    // ─── Fixed settings ───────────────────────────────────────────
+    // âââ Fixed settings âââââââââââââââââââââââââââââââââââââââââââ
     const BRIGHTNESS_STR = 0.80;
     const OUTPUT_SIZE    = 1900;
     const PADDING_PCT    = 0;
     const USE_TRANSPARENT = true;
 
-    // ─── Sample upload ────────────────────────────────────────────
+    // âââ Sample upload âââââââââââââââââââââââââââââââââââââââââââ
     document.getElementById('sampleInput').addEventListener('change', (e) => {
       if (e.target.files[0]) loadSampleImage(e.target.files[0]);
     });
@@ -375,7 +375,7 @@
           document.getElementById('sampleThumb').src = e.target.result;
           document.getElementById('sampleName').textContent = file.name;
           document.getElementById('sampleStats').textContent =
-            `平均輝度: ${sampleStats.avgBrightness.toFixed(0)} | コントラスト: ${sampleStats.contrast.toFixed(0)}`;
+            `å¹³åè¼åº¦: ${sampleStats.avgBrightness.toFixed(0)} | ã³ã³ãã©ã¹ã: ${sampleStats.contrast.toFixed(0)}`;
           document.getElementById('samplePreview').style.display = 'flex';
           document.getElementById('card1').classList.add('active-step');
           checkReady();
@@ -385,7 +385,7 @@
       reader.readAsDataURL(file);
     }
 
-    // ─── Product upload ───────────────────────────────────────────
+    // âââ Product upload âââââââââââââââââââââââââââââââââââââââââââ
     document.getElementById('productInput').addEventListener('change', (e) => {
       if (e.target.files.length) loadProductFiles(e.target.files);
     });
@@ -398,7 +398,7 @@
       if (!productFiles.length) return;
 
       document.getElementById('productCount').style.display = 'block';
-      document.getElementById('productCount').textContent = `${productFiles.length} 枚の画像が選択されています`;
+      document.getElementById('productCount').textContent = `${productFiles.length} æã®ç»åãé¸æããã¦ãã¾ã`;
       document.getElementById('card2').classList.add('active-step');
 
       // Thumbnail strip
@@ -428,16 +428,26 @@
       document.getElementById('processBtn').disabled = !ready;
     }
 
-    // ─── Image analysis ───────────────────────────────────────────
+    // âââ Image analysis âââââââââââââââââââââââââââââââââââââââââââ
+    // ç½èæ¯ãé¤å¤ãã¦ååé¨åã®è¼åº¦ã®ã¿ãè¨ç®ãã
+    // ï¼ç½èæ¯ãå¤ãç»åã§ã¯èæ¯ãå¹³åè¼åº¦ãæ­ªãã¦ã¬ã³ããéè£æ­£ã«ãªãããï¼
     function analyzeImage(imageData) {
       const data = imageData.data;
       let sumBrightness = 0;
       let values = [];
       for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i+1], b = data[i+2];
+        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+        // éæãã¯ã»ã«ãã¹ã­ãã
+        if (a < 128) continue;
+        // ç½ã«è¿ãèæ¯ãã¯ã»ã«ãã¹ã­ããï¼è¼åº¦è¨ç®ã«å«ããã¨è£æ­£ãæ­ªãï¼
+        if (r > 240 && g > 240 && b > 240) continue;
         const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
         sumBrightness += brightness;
         values.push(brightness);
+      }
+      // å¨ãã¯ã»ã«ãç½/éæã®å ´åã®ãã©ã¼ã«ããã¯
+      if (values.length === 0) {
+        return { avgBrightness: 128, contrast: 0 };
       }
       const n = values.length;
       const avgBrightness = sumBrightness / n;
@@ -446,7 +456,7 @@
       return { avgBrightness, contrast };
     }
 
-    // ─── Build LUT (Look-Up Table) for fast gamma correction ──────
+    // âââ Build LUT (Look-Up Table) for fast gamma correction ââââââ
     function buildGammaLUT(gamma) {
       const lut = new Uint8ClampedArray(256);
       for (let i = 0; i < 256; i++) {
@@ -455,7 +465,7 @@
       return lut;
     }
 
-    // ─── Process images ───────────────────────────────────────────
+    // âââ Process images âââââââââââââââââââââââââââââââââââââââââââ
     async function processImages() {
       if (!sampleStats || productFiles.length === 0) return;
 
@@ -479,13 +489,13 @@
         const pct = Math.round(((i + 1) / productFiles.length) * 100);
         document.getElementById('progressFill').style.width = pct + '%';
         document.getElementById('progressText').textContent =
-          `${i + 1} / ${productFiles.length} 枚処理中...`;
-
+          `${i + 1} / ${productFiles.length} æå¦çä¸­...`;
+        
         // yield
         await new Promise(r => setTimeout(r, 0));
       }
 
-      document.getElementById('progressText').textContent = '完了！';
+      document.getElementById('progressText').textContent = 'å®äºï¼';
       showResults();
       document.getElementById('processBtn').disabled = false;
     }
@@ -504,9 +514,9 @@
             const srcData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
             const srcStats = analyzeImage(srcData);
 
-            // ── Gamma-based brightness correction ─────────────────
-            // gamma < 1 → brightens (lifts shadows gently, protects highlights)
-            // gamma > 1 → darkens
+            // ââ Gamma-based brightness correction ââââââââââââââââââ
+            // gamma < 1 â brightens (lifts shadows gently, protects highlights)
+            // gamma > 1 â darkens
             // This avoids "white haze" that additive correction causes
             let gamma = 1.0;
             const srcB = srcStats.avgBrightness;
@@ -549,7 +559,7 @@
               // Skip near-white background pixels (white padding)
               if (!useTransparent && d[j] > 248 && d[j+1] > 248 && d[j+2] > 248) continue;
               d[j]   = lut[d[j]];
-              d[j+1] = lut[d[j+1]];
+              d[j+1] = lut[d[jYu];
               d[j+2] = lut[d[j+2]];
             }
             ctx.putImageData(pixelData, 0, 0);
@@ -561,7 +571,7 @@
       });
     }
 
-    // ─── Show results ─────────────────────────────────────────────
+    // âââ Show results ââââââââââââââââââââââââââââââââââââââââââââ
     function showResults() {
       const grid = document.getElementById('resultsGrid');
       processedCanvases.forEach(({ canvas, name }) => {
@@ -584,15 +594,15 @@
         grid.appendChild(item);
       });
 
-      document.getElementById('resultCount').textContent = processedCanvases.length + '枚';
+      document.getElementById('resultCount').textContent = processedCanvases.length + 'æ';
       document.getElementById('resultsSection').style.display = 'block';
       document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ─── Download ZIP ─────────────────────────────────────────────
+    // âââ Download ZIP âââââââââââââââââââââââââââââââââââââââââââââ
     async function downloadAll() {
       const btn = document.querySelector('.btn-download');
-      btn.textContent = '⏳ ZIPを作成中...';
+      btn.textContent = 'â³ ZIPãä½æä¸­...';
       btn.disabled = true;
 
       const zip = new JSZip();
@@ -613,7 +623,7 @@
       a.click();
       URL.revokeObjectURL(url);
 
-      btn.textContent = '📥 全てZIPでダウンロード';
+      btn.textContent = 'ð¥ å¨ã¦ZIPã§ãã¦ã³ã­ã¼ã';
       btn.disabled = false;
     }
 
@@ -623,7 +633,7 @@
       });
     }
 
-    // ─── Drag & drop helper ───────────────────────────────────────
+    // âââ Drag & drop helper ââââââââââââââââââââââââââââââââââââââââ
     function setupDrop(dropId, inputId, callback) {
       const zone = document.getElementById(dropId);
       zone.addEventListener('dragover', (e) => {
