@@ -258,6 +258,48 @@
       color: #8b7060;
       margin-top: 8px;
     }
+
+    /* Settings sliders */
+    .settings-section {
+      background: #fff;
+      border: 1.5px solid #e8e0d8;
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+    }
+    .settings-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #5a3e28;
+      margin-bottom: 14px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .slider-row:last-child { margin-bottom: 0; }
+    .slider-label {
+      font-size: 12px;
+      color: #5a3e28;
+      font-weight: 600;
+      width: 90px;
+      flex-shrink: 0;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: #c9956b;
+      cursor: pointer;
+    }
+    .slider-value {
+      font-size: 12px;
+      color: #8b7060;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -313,6 +355,23 @@
       </div>
     </div>
 
+    <!-- Settings -->
+    <div class="settings-section">
+      <div class="settings-title">⚙️  調整設定</div>
+      <div class="slider-row">
+        <div class="slider-label">補正の強さ</div>
+        <input type="range" id="strSlider" min="0" max="100" value="80"
+          oninput="document.getElementById('strVal').textContent=this.value+'%'">
+        <div class="slider-value" id="strVal">80%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">明るさ微調整</div>
+        <input type="range" id="adjSlider" min="-50" max="50" value="0"
+          oninput="document.getElementById('adjVal').textContent=(this.value>0?'+':'')+this.value">
+        <div class="slider-value" id="adjVal">0</div>
+      </div>
+    </div>
+
     <!-- Process Button -->
     <button class="btn-process" id="processBtn" disabled onclick="processImages()">
       ✨ 一括編集を開始する
@@ -344,7 +403,6 @@
     let processedCanvases = [];
 
     // ─── Fixed settings ───────────────────────────────────────────
-    const BRIGHTNESS_STR = 0.80;
     const OUTPUT_SIZE    = 1900;
     const PADDING_PCT    = 0;
     const USE_TRANSPARENT = true;
@@ -377,7 +435,7 @@
           document.getElementById('sampleStats').textContent =
             `平均輝度: ${sampleStats.avgBrightness.toFixed(0)} | コントラスト: ${sampleStats.contrast.toFixed(0)}`;
           document.getElementById('samplePreview').style.display = 'flex';
-     document.getElementById('card1').classList.add('active-step');
+          document.getElementById('card1').classList.add('active-step');
           checkReady();
         };
         img.src = e.target.result;
@@ -472,7 +530,8 @@
 
       const outputSize    = OUTPUT_SIZE;
       const paddingPct    = PADDING_PCT;
-      const brightnessStr = BRIGHTNESS_STR;
+      const brightnessStr = document.getElementById('strSlider').value / 100;
+      const brightnessAdj = parseInt(document.getElementById('adjSlider').value);
       const useTransparent = USE_TRANSPARENT;
 
       processedCanvases = [];
@@ -483,7 +542,7 @@
 
       for (let i = 0; i < productFiles.length; i++) {
         const file = productFiles[i];
-        const canvas = await processOneImage(file, outputSize, paddingPct, brightnessStr, useTransparent);
+        const canvas = await processOneImage(file, outputSize, paddingPct, brightnessStr, brightnessAdj, useTransparent);
         processedCanvases.push({ canvas, name: file.name });
 
         // progress
@@ -501,7 +560,7 @@
       document.getElementById('processBtn').disabled = false;
     }
 
-    function processOneImage(file, outputSize, paddingPct, brightnessStr, useTransparent) {
+    function processOneImage(file, outputSize, paddingPct, brightnessStr, brightnessAdj, useTransparent) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -527,8 +586,11 @@
               // Blend toward identity (1.0) based on user strength
               gamma = 1.0 + (rawGamma - 1.0) * brightnessStr;
               // Clamp to safe range to prevent extreme corrections
-              gamma = Math.max(0.35, Math.min(2.8, gamma));
+              gamma = Math.max(0.35, Math.min(2.8, gamma))
             }
+            // 明るさ微調整を追加（+50で大きく明るく、-50で大きく暗く）
+            gamma = gamma - brightnessAdj * 0.025;
+            gamma = Math.max(0.2, Math.min(4.0, gamma));
             const lut = buildGammaLUT(gamma);
 
             // Output canvas (square)
@@ -551,7 +613,7 @@
             const dy = Math.round((outputSize - dh) / 2);
             ctx.drawImage(img, dx, dy, dw, dh);
 
-     // Apply gamma correction via LUT (fast & no highlight blowout)
+            // Apply gamma correction via LUT (fast & no highlight blowout)
             const pixelData = ctx.getImageData(0, 0, outputSize, outputSize);
             const d = pixelData.data;
             for (let j = 0; j < d.length; j += 4) {
